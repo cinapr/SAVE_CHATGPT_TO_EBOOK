@@ -1,15 +1,14 @@
 # SAVE CHATGPT TO EBOOK
 Save chatGPT Conversation into EPUB
 
-
-## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 1 - BASIC CONVERSION)
-
-### Depedencies Installation
+## Depedencies Installation
 ```
 pip install ebooklib beautifulsoup4 lxml
 ```
 
-### Usage: 
+
+## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 1 - BASIC CONVERSION)
+
 1. Open the chatGPT file you want to download in Avast Browser or Google Chrome
 
 2. Right click > Inspect element > Find (Ctrl+F) > ```flex flex-col text-sm......```
@@ -35,7 +34,42 @@ pip install ebooklib beautifulsoup4 lxml
 <\html>
 ```
 
-5. Clean the HTML (optional for decrease the HTML size, not mandatory can be skipped to 6):
+5. Convert to EPUB:
+```
+python HTML_TO_EPUB_GPT.py [FILENAME.HTML] [TITLE] [AUTHOR] [SYNOPSIS (optional - in quotes)] [SERIES_ID (optional)]
+```
+
+Example : `python HTML_TO_EPUB_GPT.py "myfile.html" "The Epic Tale" "John Smith" "A thrilling journey through time and space lorem ipsum dolor sit amet consitutum tetum lorem ipsum dolor sit amet domenicus tecum ave lorom lorem ipsum dolor sit amet amet tecum" "Series123"`
+
+
+## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 2 - optional for decrease the HTML size)
+
+1. Open the chatGPT file you want to download in Avast Browser or Google Chrome
+
+2. Right click > Inspect element > Find (Ctrl+F) > ```flex flex-col text-sm......```
+
+3. Copy all content of the DIV that showed under ```flex flex-col text-sm......```
+
+4. Make a new FILENAME.HTML file in TEXT EDITOR :
+```
+<html>
+<head>
+    <style>
+        .whitespace-pre-wrap {
+            white-space: pre-wrap;
+            white-space-collapse: preserve;
+            text-wrap-mode: wrap;
+            background-color: #F4F4F4;
+        }
+    </style>
+</head>
+<body>
+    COPY THE DIV FOUND FROM THE ```flex flex-col text-sm...``` TO THIS PART
+<\body>
+<\html>
+```
+
+5. Clean the HTML (optional for decrease the HTML size):
 ```
 python HTML_ATTRIBUTE_STRIPPER.py [FILENAME.HTML]
 ```
@@ -43,10 +77,10 @@ This step will turn `[FILENAME.HTML]` into `[FILENAME_CLEANED.HTML]`
 
 6. Convert to EPUB:
 ```
-python HTML_TO_EPUB_GPT.py [FILENAME.HTML or FILENAME_CLEANED.HTML] [TITLE] [AUTHOR] [SYNOPSIS (optional - in quotes)] [SERIES_ID (optional)]
+python HTML_TO_EPUB_GPT.py [FILENAME_CLEANED.HTML] [TITLE] [AUTHOR] [SYNOPSIS (optional - in quotes)] [SERIES_ID (optional)]
 ```
 
-Example : `python HTML_TO_EPUB_GPT.py "myfile.html" "The Epic Tale" "John Smith" "A thrilling journey through time and space lorem ipsum dolor sit amet consitutum tetum lorem ipsum dolor sit amet domenicus tecum ave lorom lorem ipsum dolor sit amet amet tecum" "Series123"`
+Example : `python HTML_TO_EPUB_GPT.py "myfile_CLEANED.html" "The Epic Tale" "John Smith" "A thrilling journey through time and space lorem ipsum dolor sit amet consitutum tetum lorem ipsum dolor sit amet domenicus tecum ave lorom lorem ipsum dolor sit amet amet tecum" "Series123"`
 
 
 ## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 2 - Cosmetic fix - Optional to fix the ToC - using Calibre EBook Management)
