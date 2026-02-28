@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HTML Attribute Cleaner</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.file-section {
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 400px;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<h1>HTML Attribute Cleaner</h1>
+
+<div class="file-section">
+    <input type="file" id="fileInput" accept=".html,.htm">
+</div>
+
+<textarea id="htmlInput" placeholder="Paste your HTML here..."></textarea>
+
+<br>
+<button onclick="processHTML()">Process</button>
+
+<script>
+const TARGET_TAGS = new Set([
+    "h1","h2","h3","h4","h5","h6",
+    "p","em","b","strong",
+    "hr","br",
+    "ol","ul","li",
+    "blockquote",
+    "table","thead","tbody","tr","th","td"
+]);
+
+const SKIP_CLASS_ID = new Set(["whitespace-pre-wrap"]);
+
+document.getElementById("fileInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById("htmlInput").value = e.target.result;
+    };
+    reader.readAsText(file);
+});
+
+function processHTML() {
+    const input = document.getElementById("htmlInput").value;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(input, "text/html");
+
+    const allElements = doc.body.querySelectorAll("*");
+
+    allElements.forEach(tag => {
+        if (!TARGET_TAGS.has(tag.tagName.toLowerCase())) {
+            return;
+        }
+
+        let preservedClass = null;
+
+        if (tag.classList.length > 0) {
+            const matched = [...tag.classList].filter(cls => SKIP_CLASS_ID.has(cls));
+            if (matched.length > 0) {
+                preservedClass = matched.sort();
+            }
+        }
+
+        // Remove all attributes
+        while (tag.attributes.length > 0) {
+            tag.removeAttribute(tag.attributes[0].name);
+        }
+
+        // Restore preserved class
+        if (preservedClass) {
+            tag.setAttribute("class", preservedClass.join(" "));
+        }
+
+        // Force table border
+        if (tag.tagName.toLowerCase() === "table") {
+            tag.setAttribute("border", "1");
+        }
+    });
+
+    document.getElementById("htmlInput").value = doc.body.innerHTML;
+}
+</script>
+
+</body>
+</html>
