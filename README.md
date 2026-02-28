@@ -41,6 +41,7 @@ python HTML_TO_EPUB_GPT.py [FILENAME.HTML] [TITLE] [AUTHOR] [SYNOPSIS (optional 
 
 Example : `python HTML_TO_EPUB_GPT.py "myfile.html" "The Epic Tale" "John Smith" "A thrilling journey through time and space lorem ipsum dolor sit amet consitutum tetum lorem ipsum dolor sit amet domenicus tecum ave lorom lorem ipsum dolor sit amet amet tecum" "Series123"`
 
+---
 
 ## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 2 - optional for decrease the HTML size)
 
@@ -83,7 +84,7 @@ python HTML_TO_EPUB_GPT.py [FILENAME_CLEANED.HTML] [TITLE] [AUTHOR] [SYNOPSIS (o
 Example : `python HTML_TO_EPUB_GPT.py "myfile_CLEANED.html" "The Epic Tale" "John Smith" "A thrilling journey through time and space lorem ipsum dolor sit amet consitutum tetum lorem ipsum dolor sit amet domenicus tecum ave lorom lorem ipsum dolor sit amet amet tecum" "Series123"`
 
 
-## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 2 - Cosmetic fix - Optional to fix the ToC - using Calibre EBook Management)
+## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 3 - Cosmetic fix - Optional to fix the ToC - using Calibre EBook Management)
 
 7. Open the exported EPUB with Calibre EBook Management (Edit E-Book) [https://calibre-ebook.com/download]
 
