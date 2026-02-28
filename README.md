@@ -1,4 +1,4 @@
-# SAVE CHATGPT TO EBOOK
+# SAVE CHATGPT CONVERSATION TO EBOOK
 Save chatGPT Conversation into EPUB
 
 ## Depedencies Installation
