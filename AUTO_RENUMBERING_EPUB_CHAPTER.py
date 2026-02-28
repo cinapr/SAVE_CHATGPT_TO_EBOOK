@@ -11,9 +11,11 @@ NS = {"opf": "http://www.idpf.org/2007/opf"}
 SKIP_FILES = {"nav.xhtml", "summary.xhtml"}
 # CONFIG END
 
+
 def extract_epub(epub_path, extract_dir):
     with zipfile.ZipFile(epub_path, "r") as z:
         z.extractall(extract_dir)
+
 
 def find_opf(root):
     for dp, _, files in os.walk(root):
@@ -22,11 +24,12 @@ def find_opf(root):
                 return os.path.join(dp, f)
     raise RuntimeError("OPF not found")
 
+
 def sync_chapter_header(xhtml_path, chapter_number):
     with open(xhtml_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # ---- Update <title> (only one exists, safe) ----
+    # Update <title>
     content = re.sub(
         r"(<title>\s*Chapter\s+)\d+(\s*(?:[-–—].*?)?</title>)",
         rf"\g<1>{chapter_number}\g<2>",
@@ -34,7 +37,7 @@ def sync_chapter_header(xhtml_path, chapter_number):
         flags=re.IGNORECASE
     )
 
-    # ---- Update ONLY the first <h1> after <body> ----
+    # Update first <h1> after <body>
     def replace_first_h1(match):
         h1 = match.group(1)
         h1 = re.sub(
@@ -57,12 +60,9 @@ def sync_chapter_header(xhtml_path, chapter_number):
         f.write(content)
 
 
-
-
-
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python Auto-Renumber.py book.epub [keeptitle YES|NO] [addold YES|NO]  [add your own prefix no space]")
+        print("Usage: python Auto-Renumber.py book.epub [keeptitle YES|NO] [addold YES|NO] [prefix]")
         sys.exit(1)
 
     epub_path = sys.argv[1]
@@ -96,8 +96,12 @@ def main():
             for item in manifest.findall("opf:item", NS)
         }
 
+        rename_plan = []
         chapter_num = 1
 
+        # -----------------------------
+        # BUILD RENAME PLAN ONLY
+        # -----------------------------
         for itemref in spine.findall("opf:itemref", NS):
             item_id = itemref.attrib["idref"]
             item = id_to_item[item_id]
@@ -108,50 +112,60 @@ def main():
                 continue
 
             dirpart = os.path.dirname(href)
-
-            # START CHANGE SUFFIX & PREFIX OF THE CHAPTER.XHTML FILENAME
             name, ext = os.path.splitext(base)
 
-            new_name = None
-
             if keep_suffix:
-                # Match: anything + number + optional _suffix
-                # Examples:
-                # chap_592_supersimilarwkikyo
-                # Chapter_128_KikyoApartEnd
-                # 4567
                 m = re.match(r".*?(\d+)(?:_(.+))?$", name)
                 if m and m.group(2):
-                    # Has suffix → keep it
-                    new_name = f"Chapter_{chapter_num}_{m.group(2)}{ext}"
+                    new_name = f"chap_{chapter_num}_{m.group(2)}{ext}"
                 else:
-                    # No suffix
-                    new_name = f"Chapter_{chapter_num}{ext}"
+                    new_name = f"chap_{chapter_num}{ext}"
             else:
-                # keeptitle = NO → always plain
-                new_name = f"Chapter_{chapter_num}{ext}"
-            # END CHANGE SUFFIX & PREFIX OF THE CHAPTER.XHTML FILENAME
+                new_name = f"chap_{chapter_num}{ext}"
 
-            if(addold):
+            if addold:
                 new_name = "old_" + new_name
 
-            if(privateprefix != ""):
+            if privateprefix != "":
                 new_name = privateprefix + "_" + new_name
 
             new_href = os.path.join(dirpart, new_name) if dirpart else new_name
 
             old_path = os.path.join(os.path.dirname(opf_path), href)
-            new_path = os.path.join(os.path.dirname(opf_path), new_href)
 
-            # Change Filename
-            os.rename(old_path, new_path)
-            item.attrib["href"] = new_href
+            temp_name = f"__TEMP__REN__{chapter_num}{ext}"
+            temp_href = os.path.join(dirpart, temp_name) if dirpart else temp_name
+            temp_path = os.path.join(os.path.dirname(opf_path), temp_href)
 
-            # Change <h1> and <title>
-            sync_chapter_header(new_path, chapter_num)
+            rename_plan.append({
+                "old_path": old_path,
+                "temp_path": temp_path,
+                "final_path": os.path.join(os.path.dirname(opf_path), new_href),
+                "final_href": new_href,
+                "item": item,
+                "chapter_num": chapter_num
+            })
 
-            print(f"✔ {href} → {new_href}")
             chapter_num += 1
+
+        # -----------------------------
+        # PHASE 1: RENAME TO TEMP NAMES
+        # -----------------------------
+        for entry in rename_plan:
+            if entry["old_path"] != entry["temp_path"]:
+                os.rename(entry["old_path"], entry["temp_path"])
+
+        # -----------------------------
+        # PHASE 2: RENAME TEMP TO FINAL
+        # -----------------------------
+        for entry in rename_plan:
+            if entry["temp_path"] != entry["final_path"]:
+                os.rename(entry["temp_path"], entry["final_path"])
+
+            entry["item"].attrib["href"] = entry["final_href"]
+            sync_chapter_header(entry["final_path"], entry["chapter_num"])
+
+            print(f"✔ → {entry['final_href']}")
 
         tree.write(opf_path, encoding="utf-8", xml_declaration=True)
 
@@ -166,6 +180,7 @@ def main():
 
     finally:
         shutil.rmtree(temp_dir)
+
 
 if __name__ == "__main__":
     main()
