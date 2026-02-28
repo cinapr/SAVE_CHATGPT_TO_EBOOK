@@ -83,6 +83,7 @@ python HTML_TO_EPUB_GPT.py [FILENAME_CLEANED.HTML] [TITLE] [AUTHOR] [SYNOPSIS (o
 
 Example : `python HTML_TO_EPUB_GPT.py "myfile_CLEANED.html" "The Epic Tale" "John Smith" "A thrilling journey through time and space lorem ipsum dolor sit amet consitutum tetum lorem ipsum dolor sit amet domenicus tecum ave lorom lorem ipsum dolor sit amet amet tecum" "Series123"`
 
+---
 
 ## DOWNLOAD CHAT GPT CONVERSATION TO HTML & EPUB (PART 3 - Cosmetic fix - Optional to fix the ToC - using Calibre EBook Management)
 
@@ -120,7 +121,7 @@ Explanation: keep_title optional (YES/NO) whether keeping filename annotation Ch
 After you run the python script for rename the sequence of .xhtml, reopen Calibre EBook Management (Edit E-Book). Then re-run steps (7)
 
 
-
+---
 
 ## STRIP ATTRIBUTE FROM CHATGPT COPIED HTML (COSMETIC FIX - OPTIONAL to decrease the saved HTML size without re-run whole page using `HTML_ATTRIBUTE_STRIPPER.py`)
 
